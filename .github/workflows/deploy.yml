@@ -16,4 +16,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          script: cd github/WPU-Bot-2.0 && git pull origin main && pm2 restart main.py --interpreter python3 -- ${{ secrets.DISCORD_TOKEN }}
+          script: cd github/WPU-Bot-2.0 && git pull origin main && pm2 restart main --interpreter python3 -- ${{ secrets.DISCORD_TOKEN }}
