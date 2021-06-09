@@ -16,7 +16,8 @@ jobs:
       id: cache-virtualenv
       
     - uses: syphar/restore-pip-download-cache@v1
-      run: pip install -r requirements.txt
+    
+    - run: pip install -r requirements.txt
       
   deploy:
     needs: create-virtualenv
