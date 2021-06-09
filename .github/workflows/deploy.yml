@@ -5,35 +5,53 @@ on:
     branches: [ main ]
 
 jobs:
-  create-virtualenv:
-    runs-on: self-hosted
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v2
-    - name: restore or create a python virtualenv
-      uses: syphar/restore-virtualenv@v1.1
-      id: cache-virtualenv
+#   create-virtualenv:
+#     runs-on: self-hosted
+#     steps:
+#     - uses: actions/checkout@v1
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#     - name: restore or create a python virtualenv
+#       uses: syphar/restore-virtualenv@v1.1
+#       id: cache-virtualenv
 
-    - uses: syphar/restore-pip-download-cache@v1
-      if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+#     - uses: syphar/restore-pip-download-cache@v1
+#       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
-    - run: pip install -r requirements.txt
-      if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+#     - run: pip install -r requirements.txt
+#       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+#   deploy:
+#     needs: create-virtualenv
+#     runs-on: self-hosted
+    
+#     steps:
+#     - uses: actions/checkout@v1
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#     - name: Use venv
+#       uses: syphar/restore-virtualenv@v1
+#       id: cache-virtualenv
+
+#     - name: Run Script
+#       run: pm2 restart main.py -- $token
+#       env:
+#         token: ${{ secrets.DISCORD_TOKEN }}
 
   deploy:
-    needs: create-virtualenv
     runs-on: self-hosted
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
-    - name: Use venv
-      uses: syphar/restore-virtualenv@v1
-      id: cache-virtualenv
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Run Script
-      run: pm2 restart main.py -- $token
+      run: pm2 restart --interpreter python3 main.py -- $token
       env:
         token: ${{ secrets.DISCORD_TOKEN }}
