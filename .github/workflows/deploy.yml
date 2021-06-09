@@ -32,6 +32,6 @@ jobs:
       id: cache-virtualenv
 
     - name: Run Script
-      run: nohup python3 main.py $token &
+      run: pm2 restart main.py --interpreter python3 -- $token
       env:
         token: ${{ secrets.DISCORD_TOKEN }}
