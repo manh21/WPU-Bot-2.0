@@ -5,21 +5,31 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  create-virtualenv:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+    - uses: actions/setup-python@v2
+    - uses: syphar/restore-virtualenv@v1
+      id: cache-virtualenv
+
+    - uses: syphar/restore-pip-download-cache@v1
+      if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+    - run: pip install -r requirements.txt
+      if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+  linter:
+    needs: create-virtualenv
     runs-on: self-hosted
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        # pip install flake8 pytest 
-        pip install flake8
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+    - uses: syphar/restore-virtualenv@v1
+      id: cache-virtualenv
+
     - name: Lint with flake8
       run: |
         # stop the action if there are Python syntax errors or undefined names
@@ -28,24 +38,16 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
   deploy:
-    needs: test
+    needs: linter
     runs-on: self-hosted
     
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        # pip install flake8 pytest 
-        pip install flake8
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: run script
-      run: | 
-        python3 main.py $token
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+    - uses: syphar/restore-virtualenv@v1
+      id: cache-virtualenv
+
+    - name: Run Script
+      run: pm2 restart main.py -- $token
       env:
         token: ${{ secrets.DISCORD_TOKEN }}
-    
