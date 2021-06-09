@@ -1,3 +1,6 @@
+# -*- coding: latin-1 -*-
+
+import sys
 import discord
 from discord.ext import commands, tasks
 from discord.utils import get
@@ -142,4 +145,9 @@ extensions = [
 if __name__ == '__main__':
   for ext in extensions:
     bot.load_extension(ext)
-bot.run(os.getenv('TOKEN'))
+
+token = sys.argv[1]
+if token == "": 
+  token = os.getenv('TOKEN')
+  
+bot.run(token)
