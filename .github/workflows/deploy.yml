@@ -52,6 +52,6 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Run Script
-      run: pm2 restart --interpreter python3 main.py -- $token
+      run: pm2 restart main --interpreter python3 -- $token
       env:
         token: ${{ secrets.DISCORD_TOKEN }}
