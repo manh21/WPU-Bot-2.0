@@ -4,32 +4,14 @@ on:
   push:
     branches: [ main ]
 
-jobs:
-  create-virtualenv:
-    runs-on: self-hosted
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v2
-    - name: restore or create a python virtualenv
-      uses: syphar/restore-virtualenv@v1.1
-      id: cache-virtualenv
-      
-    - uses: syphar/restore-pip-download-cache@v1
-    
-    - run: pip install -r requirements.txt
-      
+jobs:     
   deploy:
-    needs: create-virtualenv
     runs-on: self-hosted
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
-    - name: Use venv
-      uses: syphar/restore-virtualenv@v1
-      id: cache-virtualenv
 
     - name: Run Script
       run: pm2 restart main.py --interpreter python3 -- $token
