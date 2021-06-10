@@ -1,5 +1,3 @@
-# -*- coding: latin-1 -*-
-
 import sys
 import discord
 from discord.ext import commands, tasks
