@@ -2,20 +2,24 @@ import discord
 from discord.ext import commands
 import json, asyncio
 
+orange=discord.Colour.blurple()
+
+#ubah nama bot jgn lupa
+
 class Mod(commands.Cog):
   def __init__(self,bot):
     self.bot=bot
+    
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def embed(self, ctx):
-    await ctx.delete()
-    await asyncio.sleep(1)
+    await ctx.message.delete()
     await ctx.send('Waiting for your JSON embed... `timeout in 60 seconds.`', delete_after=5)
     message = await self.bot.wait_for('message', timeout=60)
     try:
       f = json.loads(str(message.content))
       embed = discord.Embed.from_dict(f)
-      await asyncio.sleep(3)
+      await asyncio.sleep(2)
       await message.delete()
       await ctx.send(embed=embed)
     except json.JSONDecodeError:
@@ -27,54 +31,54 @@ class Mod(commands.Cog):
   @commands.has_permissions(administrator=True)
   async def setonline(self, ctx):
     await ctx.bot.change_presence(status=discord.Status.online)
-    embed = discord.Embed(color=discord.Colour.orange(), title="Set WPU's status to",description='`Online`')
+    embed = discord.Embed(color=orange, title="Set WPU's status to",description='`Online`')
     await ctx.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def setidle(self, ctx):
     await ctx.bot.change_presence(status=discord.Status.idle)
-    embed = discord.Embed(color=discord.Colour.orange(), title="Set WPU's status to",description='`Idle`')
+    embed = discord.Embed(color=orange, title="Set WPU's status to",description='`Idle`')
     await ctx.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def setdnd(self, ctx):
     await ctx.bot.change_presence(status=discord.Status.dnd)
-    embed = discord.Embed(color=discord.Colour.orange(), title="Set WPU's status to",description='`Do not disturb`')
+    embed = discord.Embed(color=orange, title="Set WPU's status to",description='`Do not disturb`')
     await ctx.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def setinv(self, ctx):
     await ctx.bot.change_presence(status=discord.Status.invisible)
-    embed = discord.Embed(color=discord.Colour.orange(), title="Set WPU's status to",description='`Invisible`')
+    embed = discord.Embed(color=orange, title="Set WPU's status to",description='`Invisible`')
     await ctx.send(embed=embed)
 
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def actplaying(self, ctx, *, name):
     await ctx.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=name))
-    embed = discord.Embed(color=discord.Colour.orange(),title="Set WPU's activity to",description=f'`playing {name}`')
+    embed = discord.Embed(color=orange,title="Set WPU's activity to",description=f'`playing {name}`')
     await ctx.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def actlistening(self, ctx, *, name):
     await ctx.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=name))
-    embed = discord.Embed(color=discord.Colour.orange(), title="Set WPU's activity to",description=f'`listening {name}`')
+    embed = discord.Embed(color=orange, title="Set WPU's activity to",description=f'`listening {name}`')
     await ctx.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def actwatching(self, ctx, *, name):
     await ctx.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=name))
-    embed = discord.Embed(color=discord.Colour.orange(),title="Set WPU's activity to",description=f'`watching {name}`')
+    embed = discord.Embed(color=orange,title="Set WPU's activity to",description=f'`watching {name}`')
     await ctx.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def actcompeting(self, ctx, *, name):
     await ctx.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.competing, name=name))
-    embed = discord.Embed(color=discord.Colour.orange(), title="Set WPU's activity to",description=f'`competing in {name}`')
+    embed = discord.Embed(color=orange, title="Set WPU's activity to",description=f'`competing in {name}`')
     await ctx.send(embed=embed)
 
   @commands.command()
-  @commands.has_permissions(administrator=True)
+  @commands.has_permissions(manage_messages=True, manage_channels=True)
   async def delete(self, ctx, limit=500, member: discord.Member=None):
     await ctx.message.delete()
     msg = []
@@ -104,31 +108,57 @@ class Mod(commands.Cog):
     await ctx.send("DM sent!")
 
   @commands.command()
-  @commands.has_permissions(administrator=True)
-  async def warn(self, ctx, *, user: discord.User):
-    if user is None:
-      embed = discord.Embed(color=discord.Colour.orange(), title=f'{ctx.author.name}',description='Please specify the user you want to warn\n Use:`+warn @user`')
-      await ctx.send(embed=embed)
-    embed = discord.Embed(color=discord.Colour.orange(), title=f'{user.name}, you have been warned!', description=f'by {ctx.author.name}')
+  @commands.has_permissions(manage_messages=True)
+  async def warn(self, ctx, member: discord.Member, *, reason="Not specified"):
+    embed = discord.Embed(title="User Warned!", description=f"**{member}** was warned by **{ctx.message.author}**!", color=orange)
+    embed.add_field(name="Reason:",value=reason)
     await ctx.send(embed=embed)
+    try:
+      await member.send(f"You were warned by **{ctx.message.author}**!\nReason: {reason}")
+    except:
+      pass
+    channel = ctx.bot.get_channel(856758248416870450)
+    embed = discord.Embed(title=f"WARNED", description=f"{member}\nReason: {reason}\nBy:",colour=discord.Color.red())
+    embed.set_footer(text=f"{ctx.author.name}", icon_url=ctx.author.avatar_url)
+    await channel.send('––––––––––––––––––––––––––––––––––––––––––––––––',embed=embed)
   @commands.command()
-  @commands.has_permissions(administrator=True)
-  async def kick(self, ctx, member: discord.Member, *, reason=None):
-    if member is None:
-      embed = discord.Embed(color=discord.Colour.orange(),title=f'{ctx.author.name}',description='Please specify the user you want to kick\n Use:`+kick @user`')
+  @commands.has_permissions(kick_members=True)
+  async def kick(self, ctx, member: discord.Member, *, reason="Not specified"):
+    if member.guild_permissions.administrator:
+      embed = discord.Embed(title="Error!",description="User is an Admin", color=discord.Colour.red())
       await ctx.send(embed=embed)
-    await member.kick(reason=reason)
-    embed = discord.Embed(color=discord.Colour.orange(), title=f'Goodbye, {member.name}',description=f'kicked by {ctx.author.name}')
-    await ctx.send(embed=embed)
+    else:
+      try:
+        await member.kick(reason=reason)
+        embed = discord.Embed(title="User Kicked!",description=f"**{member}** was kicked by **{ctx.message.author}**!",color=orange)
+        embed.add_field(name="Reason:", value=reason)
+        await ctx.send(embed=embed)
+        try:
+          await member.send(f"You were kicked by **{ctx.message.author}**!\nReason: {reason}")
+        except:
+          pass
+      except:
+        embed = discord.Embed(title="Error!", description="An error occurred while trying to kick the user. Make sure my role is above the role of the user you want to kick.",color=discord.Colour.red())
+        await ctx.message.channel.send(embed=embed)
   @commands.command()
-  @commands.has_permissions(administrator=True)
-  async def ban(self, ctx, member: discord.Member, *, reason=None):
-    if member is None:
-      embed = discord.Embed(color=discord.Colour.orange(), title=f'{ctx.author.name}',description='Please specify the user you want to ban\n Use:`+ban @user`')
+  @commands.has_permissions(ban_members=True)
+  async def ban(self, ctx, member: discord.Member, *, reason="Not specified"):
+    if member.guild_permissions.administrator:
+      embed = discord.Embed(title="Error!",description="User is an Admin", color=discord.Colour.red())
       await ctx.send(embed=embed)
-    await member.ban(reason=reason)
-    embed = discord.Embed(color=discord.Colour.orange(), title=f'Goodbye, {member.name}',description=f'banned by {ctx.author.name}')
-    await ctx.send(embed=embed)
+    else:
+      try:
+        await member.ban(reason=reason)
+        embed = discord.Embed(title="User Banned!",description=f"**{member}** was banned by **{ctx.message.author}**!",color=orange)
+        embed.add_field(name="Reason:", value=reason)
+        await ctx.send(embed=embed)
+        try:
+          await member.send(f"You were banned by **{ctx.message.author}**!\nReason: {reason}")
+        except:
+          pass
+      except:
+        embed = discord.Embed(title="Error!", description="An error occurred while trying to ban the user. Make sure my role is above the role of the user you want to kick.",color=discord.Colour.red())
+        await ctx.message.channel.send(embed=embed)
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def mute(self, ctx, member: discord.Member):
@@ -138,10 +168,10 @@ class Mod(commands.Cog):
       perms = discord.Permissions(send_messages=False, speak=False)
       await guild.create_role(name="Muted", permissions=perms)
       await member.add_roles(role)
-      await ctx.send(f"Muted {member} >:D")
+      await ctx.send(f"Muted {member}")
     else:
       await member.add_roles(role) 
-      await ctx.send(f"Muted {member} >:D")
+      await ctx.send(f"Muted {member}")
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def unmute(self, ctx, member: discord.Member):
@@ -155,6 +185,17 @@ class Mod(commands.Cog):
     else:
       await member.remove_roles(role) 
       await ctx.send(f"Unmuted {member}")
+
+  @commands.command()
+  @commands.has_permissions(manage_nicknames=True)
+  async def nick(self, ctx, member: discord.Member, *, nickname=None):
+    try:
+      await member.edit(nick=nickname)
+      embed = discord.Embed(title="Changed Nickname!", description=f"**{member}'s** new nickname is **{nickname}**!", color=orange)
+      await ctx.send(embed=embed)
+    except:
+      embed = discord.Embed(title="Error!", description="An error occurred while trying to change the nickname of the user. Make sure my role is above the role of the user you want to change the nickname.", color=orange)
+      await ctx.message.channel.send(embed=embed)
 
 def setup(bot):
   bot.add_cog(Mod(bot))
