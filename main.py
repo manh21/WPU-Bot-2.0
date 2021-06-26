@@ -284,7 +284,6 @@ extensions = [
   'cogs.miscellaneous', 
   'cogs.mod', 
   'cogs.reminder', 
-  'cogs.voice', 
   'cogs.info'  
 ]
 
