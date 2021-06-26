@@ -290,4 +290,12 @@ extensions = [
 if __name__ == '__main__':
   for ext in extensions:
     bot.load_extension(ext)
-bot.run(os.getenv('TOKEN'))
+
+token = ""
+if sys.argv[1]: 
+  token = sys.argv[1]
+
+if os.getenv('TOKEN'):
+  token = os.getenv('TOKEN')
+
+bot.run(token)
