@@ -43,7 +43,15 @@ class Misc(commands.Cog):
     
   @commands.command(aliases=['calc'])
   async def calculate(self, ctx, *, q):
-    await ctx.send("menghadeh")
+    
+    allowed_symbol = ["*", "+", "-", "/", "**", "//", "%", "(", ")", ","] 
+    
+    evaluasi = [symbol for symbol in q if symbol in allowed_symbol or symbol.isdigit()]
+    
+    try:
+      await ctx.send(eval("".join(evaluasi)))
+    except Exception as E:
+      await ctx.send("Error dalam mengevaluasi bilangan.")
 
   @commands.command(aliases=['pick'])
   async def choose(self, ctx, *, choices: str):
@@ -51,11 +59,8 @@ class Misc(commands.Cog):
   
   @commands.command()
   async def regional(self,ctx, *, msg):
-    await ctx.message.delete()
-    msg = list(msg)
-    regional_list = [self.regionals[x.lower()] if x.isalnum() or x in ["!", "?"] else x for x in msg]
-    regional_output = '\u200b'.join(regional_list)
-    await ctx.send(regional_output)
+    pass
+    #disalahgunakan >:(
     
   @commands.command()
   async def ping(self, ctx):
@@ -78,6 +83,7 @@ class Misc(commands.Cog):
   async def bitcoin(self, ctx):
     url = "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
     async with aiohttp.ClientSession() as session:
+      self.bot.client_session = session # Satu sesi untuk semua API request dengan aiohttp
       raw_response = await session.get(url)
       response = await raw_response.text()
       response = json.loads(response)
